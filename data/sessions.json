@@ -1,0 +1,16 @@
+[
+    {
+        "sessionId": "abc123",
+        "userId": "user001",
+        "startTime": "2023-10-01T10:00:00Z",
+        "endTime": "2023-10-01T11:00:00Z",
+        "isActive": false
+    },
+    {
+        "sessionId": "def456",
+        "userId": "user002",
+        "startTime": "2023-10-01T12:00:00Z",
+        "endTime": null,
+        "isActive": true
+    }
+]

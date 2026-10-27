@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CashApp MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'SF Pro Display', system-ui, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center relative">
+
+    <!-- Pop-up Notification Modal -->
+    <div id="statusModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full mx-4 shadow-2xl text-center transform transition-all duration-300 scale-95 opacity-0" id="modalBox">
+            
+            <!-- Success / Error Icon Container -->
+            <div id="modalIconContainer" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <i id="modalIcon" class="fas"></i>
+            </div>
+
+            <!-- Modal Title & Message -->
+            <h3 id="modalTitle" class="text-xl font-bold text-gray-900 mb-2"></h3>
+            <div id="modalMessage" class="text-sm text-gray-600 space-y-2 mb-6"></div>
+
+            <!-- Action Button -->
+            <button id="modalBtn" onclick="closeNotificationModal()" 
+                    class="w-full py-3.5 rounded-2xl font-semibold text-white transition shadow-md cursor-pointer">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 md:p-10 my-8">
+        
+        <!-- Logo & Header -->
+        <div class="text-center mb-10">
+            <div class="w-16 h-16 bg-green-600 rounded-2xl mx-auto flex items-center justify-center text-white text-5xl font-bold mb-4">
+                $
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900">Welcome Back</h1>
+            <p class="text-gray-500 mt-2">Sign in to your CashApp account</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <input type="email" id="email" 
+                       class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:border-green-500 transition"
+                       placeholder="you@example.com" required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <input type="password" id="password" 
+                       class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:border-green-500 transition"
+                       placeholder="••••••••" required>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 rounded-2xl transition text-lg cursor-pointer shadow-md">
+                Log In
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="my-8 flex items-center gap-4">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span class="text-gray-400 text-sm">OR</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+        </div>
+
+        <!-- Signup Link -->
+        <p class="text-center text-gray-600">
+            Don't have an account? 
+            <a href="signup.html" class="text-green-600 font-semibold hover:underline">Sign up</a>
+        </p>
+
+    </div>
+
+    <!-- Corrected script path pointing to public/js/auth.js -->
+    <script src="js/auth.js"></script>
+</body>
+</html>

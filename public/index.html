@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashApp - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'SF Pro Display', system-ui, sans-serif; }
+        .card-hover:hover { transform: translateY(-4px); transition: all 0.3s; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Top Navigation -->
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold">$</div>
+                <h1 class="text-3xl font-semibold text-gray-900">CashApp</h1>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <div id="user-avatar" class="w-9 h-9 bg-green-600 text-white rounded-full flex items-center justify-center font-semibold">U</div>
+                    <div>
+                        <p id="user-name" class="font-medium text-sm">Loading...</p>
+                        <p id="user-cashtag" class="text-xs text-gray-500">$cashtag</p>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="px-4 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-2xl text-sm font-medium">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Balance Card -->
+        <div class="bg-gradient-to-br from-green-600 to-emerald-700 text-white rounded-3xl p-8 mb-10 shadow-xl">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-sm opacity-75">Available USD Balance</p>
+                    <p id="balance" class="text-5xl font-bold mt-2">$0.00</p>
+                    <p class="text-xs opacity-80 mt-1">BTC Balance: <span id="btc-balance" class="font-bold">0.00000000 BTC</span></p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm opacity-75">Cashtag</p>
+                    <p id="display-cashtag" class="text-2xl font-medium">$cashtag</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-4 mt-8">
+                <button onclick="showSendModal()" 
+                        class="bg-white text-green-700 py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-100 cursor-pointer">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+                <button onclick="showRequestModal()" 
+                        class="bg-white/20 backdrop-blur py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 cursor-pointer hover:bg-white/30">
+                    <i class="fas fa-hand-holding-dollar"></i> Request
+                </button>
+                <button onclick="showBtcHubModal()" 
+                        class="bg-white/20 backdrop-blur py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 cursor-pointer hover:bg-white/30">
+                    <i class="fab fa-bitcoin"></i> Bitcoin
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <h2 class="text-xl font-semibold mb-5">Quick Actions</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+            <div onclick="showSendModal()" class="bg-white p-6 rounded-3xl card-hover cursor-pointer text-center">
+                <i class="fas fa-at text-4xl text-green-500 mb-4"></i>
+                <p class="font-semibold">Send via Cashtag</p>
+            </div>
+            <div onclick="showBtcHubModal()" class="bg-white p-6 rounded-3xl card-hover cursor-pointer text-center">
+                <i class="fab fa-bitcoin text-4xl text-orange-500 mb-4"></i>
+                <p class="font-semibold">Bitcoin Wallet</p>
+            </div>
+            <div onclick="showQrModal()" class="bg-white p-6 rounded-3xl card-hover cursor-pointer text-center">
+                <i class="fas fa-qrcode text-4xl text-blue-500 mb-4"></i>
+                <p class="font-semibold">Scan QR</p>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold">Recent Activity</h2>
+        </div>
+        
+        <div id="recent-activity" class="bg-white p-6 rounded-3xl shadow-sm space-y-4">
+            <p class="text-gray-500 text-sm">No recent transactions yet.</p>
+        </div>
+    </div>
+
+    <!-- Main Bitcoin Action Hub Modal -->
+    <div id="btcHubModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center relative shadow-2xl">
+            <button onclick="closeModal('btcHubModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            
+            <div class="w-14 h-14 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-3">
+                <i class="fab fa-bitcoin"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-1">Bitcoin Operations</h3>
+            <p class="text-xs text-gray-500 mb-6">Manage your crypto portfolio</p>
+
+            <!-- Action Choices -->
+            <div class="space-y-3">
+                <button onclick="openBtcOption('btcModal')" class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition cursor-pointer border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="text-left">
+                            <p class="font-bold text-sm text-gray-900">Convert to BTC</p>
+                            <p class="text-xs text-gray-500">Exchange USD & BTC</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                </button>
+
+                <button onclick="openBtcOption('sendBtcModal')" class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition cursor-pointer border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center"><i class="fas fa-arrow-up"></i></div>
+                        <div class="text-left">
+                            <p class="font-bold text-sm text-gray-900">Send Bitcoin</p>
+                            <p class="text-xs text-gray-500">Transfer to external wallet</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                </button>
+
+                <button onclick="openBtcOption('receiveBtcModal')" class="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition cursor-pointer border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center"><i class="fas fa-arrow-down"></i></div>
+                        <div class="text-left">
+                            <p class="font-bold text-sm text-gray-900">Receive Bitcoin</p>
+                            <p class="text-xs text-gray-500">View your wallet address</p>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receive BTC Modal -->
+    <div id="receiveBtcModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center relative shadow-2xl">
+            <button onclick="closeModal('receiveBtcModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+
+            <div class="w-12 h-12 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-xl font-bold mx-auto mb-3">
+                <i class="fab fa-bitcoin"></i>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-1">Receive Bitcoin</h3>
+            <p class="text-xs text-gray-500 mb-6">Use your unique Bitcoin wallet address below to receive funds.</p>
+
+            <div class="bg-gray-50 border border-gray-200 p-4 rounded-2xl text-left mb-4">
+                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Your BTC Address</label>
+                <div id="userBtcAddressDisplay" class="font-mono text-xs text-gray-800 break-all select-all font-semibold">
+                    bc1q...
+                </div>
+            </div>
+
+            <button onclick="copyBtcAddress()" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-2xl font-semibold text-sm transition flex items-center justify-center gap-2 shadow-md">
+                <i class="fas fa-copy"></i> Copy BTC Address
+            </button>
+        </div>
+    </div>
+
+    <!-- Send USD Modal -->
+    <div id="sendModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-8">
+            <h3 class="text-2xl font-semibold mb-6">Send Money</h3>
+            <form id="sendMoneyForm">
+                <input id="recipientCashtag" type="text" placeholder="$cashtag" required
+                       class="w-full px-5 py-4 border rounded-2xl mb-6 text-lg">
+                <div class="relative mb-8">
+                    <span class="absolute left-5 top-5 text-2xl">$</span>
+                    <input id="transferAmount" type="number" step="0.01" min="1" placeholder="0.00" required
+                           class="w-full pl-10 pr-5 py-4 text-4xl border rounded-2xl">
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('sendModal')" class="flex-1 py-4 border rounded-2xl font-medium cursor-pointer">Cancel</button>
+                    <button type="submit" class="flex-1 bg-green-600 text-white py-4 rounded-2xl font-semibold cursor-pointer">Send Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Request Money Modal -->
+    <div id="requestModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-8">
+            <h3 class="text-2xl font-semibold mb-6">Request Money</h3>
+            <form id="requestMoneyForm">
+                <input id="reqCashtag" type="text" placeholder="From $cashtag" required
+                       class="w-full px-5 py-4 border rounded-2xl mb-6 text-lg">
+                <div class="relative mb-8">
+                    <span class="absolute left-5 top-5 text-2xl">$</span>
+                    <input id="reqAmount" type="number" step="0.01" min="1" placeholder="0.00" required
+                           class="w-full pl-10 pr-5 py-4 text-4xl border rounded-2xl">
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('requestModal')" class="flex-1 py-4 border rounded-2xl font-medium cursor-pointer">Cancel</button>
+                    <button type="submit" class="flex-1 bg-green-600 text-white py-4 rounded-2xl font-semibold cursor-pointer">Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- BTC Convert Modal -->
+    <div id="btcModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-8">
+            <h3 class="text-2xl font-semibold mb-2">Convert USD to BTC</h3>
+            <p class="text-xs text-gray-500 mb-6">Rate: 1 BTC ≈ $60,000.00</p>
+            <form id="convertBtcForm">
+                <div class="relative mb-6">
+                    <span class="absolute left-5 top-4 text-xl">$</span>
+                    <input id="convertAmount" type="number" step="0.01" min="1" placeholder="USD Amount" required
+                           class="w-full pl-10 pr-5 py-3 border rounded-2xl text-xl">
+                </div>
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('btcModal')" class="flex-1 py-4 border rounded-2xl font-medium cursor-pointer">Cancel</button>
+                    <button type="submit" class="flex-1 bg-orange-500 text-white py-4 rounded-2xl font-semibold cursor-pointer">Convert</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Send BTC Modal -->
+    <div id="sendBtcModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-8">
+            <h3 class="text-2xl font-semibold mb-6">Send Bitcoin</h3>
+            <form id="sendBtcForm">
+                <input id="btcAddress" type="text" placeholder="Bitcoin Wallet Address" required
+                       class="w-full px-5 py-4 border rounded-2xl mb-6 text-sm font-mono">
+                <input id="btcSatoshi" type="number" step="0.00000001" min="0.00000001" placeholder="Amount (BTC)" required
+                       class="w-full px-5 py-4 border rounded-2xl mb-6 text-lg">
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeModal('sendBtcModal')" class="flex-1 py-4 border rounded-2xl font-medium cursor-pointer">Cancel</button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white py-4 rounded-2xl font-semibold cursor-pointer">Send BTC</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scan QR Modal -->
+    <div id="qrModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-8 text-center">
+            <h3 class="text-2xl font-semibold mb-4">My QR Code</h3>
+            <div class="bg-gray-100 p-6 rounded-2xl inline-block mb-4">
+                <i class="fas fa-qrcode text-9xl text-gray-800"></i>
+            </div>
+            <p id="qrCashtag" class="font-bold text-lg text-green-600 mb-6">$cashtag</p>
+            <button onclick="closeModal('qrModal')" class="w-full py-4 bg-gray-200 rounded-2xl font-semibold">Close</button>
+        </div>
+    </div>
+
+    <!-- Modal trigger helpers -->
+    <script>
+        function showSendModal() { document.getElementById('sendModal').classList.remove('hidden'); }
+        function showRequestModal() { document.getElementById('requestModal').classList.remove('hidden'); }
+        function showBtcHubModal() { document.getElementById('btcHubModal').classList.remove('hidden'); }
+        function showQrModal() { document.getElementById('qrModal').classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function openBtcOption(modalId) {
+            closeModal('btcHubModal');
+            if (modalId === 'receiveBtcModal') {
+                const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const addressDisplay = document.getElementById('userBtcAddressDisplay');
+                if (addressDisplay && user && user.btcAddress) {
+                    addressDisplay.textContent = user.btcAddress;
+                }
+            }
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function copyBtcAddress() {
+            const addressText = document.getElementById('userBtcAddressDisplay').textContent.trim();
+            if (addressText && addressText !== 'bc1q...') {
+                navigator.clipboard.writeText(addressText);
+                alert('Bitcoin address copied to clipboard!');
+            }
+        }
+    </script>
+
+    <script src="js/notification.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/transaction.js"></script>
+</body>
+</html>

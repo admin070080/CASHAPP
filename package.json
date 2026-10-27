@@ -1,0 +1,25 @@
+{
+  "name": "cashapp-mvp",
+  "version": "1.0.0",
+  "description": "CashApp MVP with Node.js and Neon PostgreSQL",
+  "main": "backend/server.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "node backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.19.2",
+    "pg": "^8.11.3",
+    "serverless-http": "^4.0.0"
+  }
+}

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - CashApp MVP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'SF Pro Display', system-ui, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Admin Login Modal / Overlay (Shown by default until authenticated) -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-black rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3">🔒</div>
+                <h2 class="text-2xl font-bold text-gray-900">Admin Authentication</h2>
+                <p class="text-xs text-gray-500 mt-1">Enter super admin password to proceed</p>
+            </div>
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="adminPasswordInput" placeholder="Admin Password" required
+                           class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-center text-lg">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-2xl font-semibold transition cursor-pointer shadow-md">
+                    Access Portal
+                </button>
+            </form>
+            <div class="text-center mt-4">
+                <a href="index.html" class="text-xs text-gray-500 hover:underline">← Back to User Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navigation -->
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-black rounded-2xl flex items-center justify-center text-white text-2xl font-bold">⚙️</div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">Admin Portal</h1>
+                    <p class="text-xs text-gray-500">CashApp MVP System Control</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button onclick="adminLogout()" 
+                        class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-2xl text-sm font-medium transition cursor-pointer">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Lock Admin
+                </button>
+                <button onclick="window.location.href='index.html'" 
+                        class="px-5 py-2 bg-gray-100 hover:bg-gray-200 rounded-2xl text-sm font-medium transition cursor-pointer">
+                    <i class="fas fa-arrow-left mr-2"></i> Dashboard
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Admin Header / Summary Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-3xl p-6 shadow-lg md:col-span-3">
+                <p class="text-xs uppercase tracking-wider text-gray-400">Control Center</p>
+                <h3 class="text-2xl font-bold mt-1">System Management & Transaction Injection</h3>
+                <p class="text-sm text-gray-300 mt-2">Instantly fund user accounts, modify wallet addresses, and inject custom transaction histories with proper formatting.</p>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Actions (Fund, Edit BTC, Inject Transaction) -->
+            <div class="space-y-6">
+                <!-- 1. Fund User Account -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-wallet text-green-600"></i> Fund User Account
+                    </h3>
+                    <form id="adminFundForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Target Cashtag</label>
+                            <input id="targetCashtag" type="text" placeholder="$john" required
+                                   class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Amount ($)</label>
+                            <input id="fundAmount" type="number" step="0.01" min="1" placeholder="100.00" required
+                                   class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-2xl font-semibold transition cursor-pointer shadow-md text-sm">
+                            Credit Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 2. Edit User BTC Address -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-btc text-orange-500"></i> Edit BTC Address
+                    </h3>
+                    <form onsubmit="adminUpdateUserBtc(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Target Cashtag</label>
+                            <input id="btcUpdateCashtag" type="text" placeholder="$john" required
+                                   class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">New BTC Wallet Address</label>
+                            <input id="adminNewBtcAddress" type="text" placeholder="bc1q..." required
+                                   class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-2xl font-semibold transition cursor-pointer shadow-md text-sm">
+                            Update Wallet Address
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3. Inject Custom Transaction -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-history text-blue-600"></i> Inject Transaction History
+                    </h3>
+                    <form onsubmit="adminInjectTransaction(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Target Cashtag</label>
+                            <input id="txTargetTag" type="text" placeholder="$john" required
+                                   class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Transaction Type</label>
+                            <select id="txType" class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm bg-white">
+                                <option value="ADMIN_FUND">Admin Funding</option>
+                                <option value="TRANSFER">P2P Transfer</option>
+                                <option value="BONUS">System Bonus</option>
+								<option value="BONUS">Undef Funding</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Amount ($)</label>
+                            <input id="txAmount" type="number" step="0.01" min="1" placeholder="50.00" required
+                                   class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 text-sm">
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-semibold transition cursor-pointer shadow-md text-sm">
+                            Add to History Ledger
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Registered Users Table -->
+            <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-sm border border-gray-100 h-fit">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-users text-green-600"></i> Registered Users Directory
+                    </h3>
+                    <button onclick="loadAdminUsers()" class="text-xs text-green-600 font-semibold hover:underline cursor-pointer">
+                        <i class="fas fa-sync-alt mr-1"></i> Refresh List
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b text-xs uppercase text-gray-400 tracking-wider">
+                                <th class="pb-3 font-semibold">Name / Email</th>
+                                <th class="pb-3 font-semibold">Cashtag</th>
+                                <th class="pb-3 font-semibold">USD Balance</th>
+                                <th class="pb-3 font-semibold">BTC Address</th>
+                                <th class="pb-3 font-semibold">Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUserTableBody" class="divide-y text-sm text-gray-700">
+                            <tr>
+                                <td colspan="5" class="py-6 text-center text-gray-400">Loading users...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Secure Backend Admin Authentication Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const isAdminAuth = sessionStorage.getItem('isAdminAuthenticated');
+            if (isAdminAuth === 'true') {
+                document.getElementById('adminLoginModal').style.display = 'none';
+            }
+        });
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPasswordInput').value;
+            
+            try {
+                const response = await fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    sessionStorage.setItem('isAdminAuthenticated', 'true');
+                    document.getElementById('adminLoginModal').style.display = 'none';
+                    if (typeof loadAdminUsers === 'function') loadAdminUsers();
+                } else {
+                    alert('Incorrect admin password!');
+                    document.getElementById('adminPasswordInput').value = '';
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                alert('Failed to connect to authentication server.');
+            }
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem('isAdminAuthenticated');
+            window.location.reload();
+        }
+
+        // Admin Action Handlers
+        async function adminUpdateUserBtc(e) {
+            e.preventDefault();
+            const cashtag = document.getElementById('btcUpdateCashtag').value.trim();
+            const btcAddress = document.getElementById('adminNewBtcAddress').value.trim();
+
+            try {
+                const res = await fetch('/api/admin/update-user', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cashtag, btcAddress })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if (data.success) {
+                    document.getElementById('btcUpdateCashtag').value = '';
+                    document.getElementById('adminNewBtcAddress').value = '';
+                    if (typeof loadAdminUsers === 'function') loadAdminUsers();
+                }
+            } catch (err) {
+                console.error('Error updating BTC address:', err);
+                alert('Failed to update user address.');
+            }
+        }
+
+        async function adminInjectTransaction(e) {
+            e.preventDefault();
+            const targetCashtag = document.getElementById('txTargetTag').value.trim();
+            const type = document.getElementById('txType').value;
+            const amount = parseFloat(document.getElementById('txAmount').value);
+
+            try {
+                const res = await fetch('/api/admin/add-transaction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        targetCashtag,
+                        type,
+                        amount,
+                        from: type === 'TRANSFER' ? '$EXTERNAL' : '$ADMIN',
+                        to: targetCashtag
+                    })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if (data.success) {
+                    document.getElementById('txTargetTag').value = '';
+                    document.getElementById('txAmount').value = '';
+                }
+            } catch (err) {
+                console.error('Error injecting transaction:', err);
+                alert('Failed to inject custom transaction.');
+            }
+        }
+    </script>
+
+    <!-- Script connection -->
+    <script src="js/admin.js"></script>
+</body>
+</html>
